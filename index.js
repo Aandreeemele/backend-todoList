@@ -28,6 +28,7 @@ const PORT = process.env.PORT || 3000;
 // Crea un servidor web y lo deja "escuchando" en el puerto 3000
 // Permite que tu backend reciba solicitudes (GET, POST, etc.)
 // desde clientes (navegadores, apps móviles, etc.).
-app.listen(PORT,()=>{
-    console.log(`Servidor: http://localhost:${PORT}`);
-})
+const HOST = '0.0.0.0';
+app.listen(PORT, HOST, () => {
+    console.log(`Servidor en: http://${HOST}:${PORT}`);
+});
