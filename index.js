@@ -1,34 +1,38 @@
-// Se importa la dependencia dotenv para administrar las variables
-// de entorno del archivo .env
-require('dotenv').config();
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import { pool } from './confing/dataBase.js'; // Verifica que la carpeta sea realmente 'confing' o 'config'
+import getTablas from './routers/get/obtenerTablas.js';
+import getTareas from './routers/get/ObtenerTareas.js';
 
-// importando el módulo express
-const express = require('express');
+dotenv.config();
 
-/**
- * Crea la instancia principal de Express.
- * Esta será la base para:
- * - Definir rutas (app.get/post/put/delete)
- * - Registrar middlewares (app.use)
- * - Iniciar el servidor (app.listen)
- */
 const app = express();
-
-// MIS RUTAS MIDDLEWARE
-app.get('/',(req,res)=>{
-    res.send("Mi backEnd con ExpressJS");
-});
-
-// CONFIGURACIÓN DEL SERVIDOR
-// process.env.PORT: Lee el puerto desde las variables de entorno (archivo .env)
-// || 3000: Si no existe, usa el puerto 3000 (operador "OR" de JavaScript)
 const PORT = process.env.PORT || 3000;
 
+// ✅ Middleware CORS: solo permite tu front
+app.use(cors({
+  origin: 'http://127.0.0.1:5500'
+}));
 
-// Crea un servidor web y lo deja "escuchando" en el puerto 3000
-// Permite que tu backend reciba solicitudes (GET, POST, etc.)
-// desde clientes (navegadores, apps móviles, etc.).
-const HOST = '0.0.0.0';
-app.listen(PORT, HOST, () => {
-    console.log(`Servidor en: http://${HOST}:${PORT}`);
+// Middleware para parsear JSON
+app.use(express.json());
+
+// Middlewares de rutas
+app.use('/api', getTablas);
+app.use('/api', getTareas);
+
+// Prueba de conexión a MySQL
+(async () => {
+  try {
+    const [results] = await pool.query('SELECT 1 + 1 AS result');
+    console.log('✅ Conexión a MySQL exitosa:', results[0].result);
+  } catch (err) {
+    console.error('❌ Error de conexión a MySQL:', err);
+  }
+})();
+
+// Servidor
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en: http://localhost:${PORT}`);
 });
