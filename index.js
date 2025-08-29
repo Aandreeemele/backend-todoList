@@ -12,13 +12,13 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// 🔹 Función para crear pool con reconexión
+// 🔹 Pool usando directamente la URI de conexión de Clever Cloud
 let pool;
 
 async function createPool(retries = 5, delay = 3000) {
   for (let i = 0; i < retries; i++) {
     try {
-      pool = mysql.createPool({
+      pool = await mysql.createPool(process.env.DB_URI || {
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         password: process.env.DB_PASS,
@@ -35,7 +35,7 @@ async function createPool(retries = 5, delay = 3000) {
       conn.release();
       break;
     } catch (err) {
-      console.error(`❌ Error de conexión a MySQL (intento ${i + 1}):`, err);
+      console.error(`❌ Error de conexión a MySQL (intento ${i + 1}):`, err.message);
       if (i < retries - 1) {
         console.log(`⏳ Reintentando en ${delay / 1000} segundos...`);
         await new Promise(r => setTimeout(r, delay));
