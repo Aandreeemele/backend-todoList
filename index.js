@@ -19,15 +19,14 @@ async function createPool(retries = 5, delay = 3000) {
   for (let i = 0; i < retries; i++) {
     try {
       pool = await mysql.createPool(process.env.DB_URI || {
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASS,
-        database: process.env.DB_NAME,
-        port: process.env.DB_PORT || 3306,
+        host: "bnnyxyyr7umvvnvy0ddb-mysql.services.clever-cloud.com", // 👈 Host de Clever
+        user: "uhzgphosb1hnwnej", // 👈 Usuario de Clever
+        password: "nvC5O6ahfPD9beJYhqp9", // 👈 Contraseña de Clever
+        database: "bnnyxyyr7umvvnvy0ddb", // 👈 Nombre DB de Clever
+        port: 3306,
         waitForConnections: true,
         connectionLimit: 10,
-        queueLimit: 0,
-        charset: 'utf8mb4'
+        queueLimit: 0
       });
 
       const conn = await pool.getConnection();
