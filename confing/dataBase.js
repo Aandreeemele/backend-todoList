@@ -1,5 +1,5 @@
-// confing/dataBase.js
-import mysql from 'mysql2/promise'; // <<<< clave: /promise
+// config/dataBase.js
+import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -8,7 +8,7 @@ export const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 3306,   // <-- agrega esto
+  port: process.env.DB_PORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
