@@ -2,7 +2,7 @@ import express from 'express';
 import { pool } from '../../config/dataBase.js';
 const router = express.Router();
 
-router.get('/tablas', async (req, res) => {
+router.get('/api/tablas', async (req, res) => {
   try {
     const [tablas] = await pool.query('SHOW TABLES;');
     res.json(tablas);

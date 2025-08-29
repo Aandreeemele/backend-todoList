@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { pool } from './config/dataBase.js';
+import { pool } from './config/dataBase.js'; // solo una vez
 import getTablas from './routers/get/obtenerTablas.js';
 import getTareas from './routers/get/obtenerTareas.js';
 
@@ -10,11 +10,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Middleware
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// ✅ Rutas
 app.use('/api', getTablas);
 app.use('/api', getTareas);
 
@@ -30,10 +28,8 @@ pool.getConnection()
   })
   .catch(err => {
     console.error('❌ Error de conexión a MySQL:', err.message);
-    // NOTA: No termina la app, el server seguirá levantándose
   });
 
-// Servidor
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en: http://localhost:${PORT}`);
 });
