@@ -1,17 +1,16 @@
-// index.js
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { pool } from './config/dataBase.js';
 import getTablas from './routers/get/obtenerTablas.js';
-import getTareas from './routers/get/obtenerTareas.js'; 
+import getTareas from './routers/get/obtenerTareas.js';
+import { pool } from './config/dataBase.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ CORS (ajusta según tu frontend)
+// ✅ CORS
 app.use(cors({ origin: '*' }));
 
 // Middleware para parsear JSON
@@ -21,7 +20,7 @@ app.use(express.json());
 app.use('/api', getTablas);
 app.use('/api', getTareas);
 
-// 🔎 Ruta de prueba para saber si corre
+// Ruta de prueba
 app.get("/", (req, res) => {
   res.json({ message: "Servidor funcionando 🚀" });
 });
