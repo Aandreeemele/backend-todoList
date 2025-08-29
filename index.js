@@ -12,18 +12,42 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// ✅ Conexión a MySQL
-export const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 3306,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  charset: 'utf8mb4'
-});
+// 🔹 Función para crear pool con reconexión
+let pool;
+
+async function createPool(retries = 5, delay = 3000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      pool = mysql.createPool({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        database: process.env.DB_NAME,
+        port: process.env.DB_PORT || 3306,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
+        charset: 'utf8mb4'
+      });
+
+      const conn = await pool.getConnection();
+      console.log('✅ Conexión a MySQL exitosa');
+      conn.release();
+      break; // conexión exitosa, salimos del loop
+    } catch (err) {
+      console.error(`❌ Error de conexión a MySQL (intento ${i + 1}):`, err);
+      if (i < retries - 1) {
+        console.log(`⏳ Reintentando en ${delay / 1000} segundos...`);
+        await new Promise(r => setTimeout(r, delay));
+      } else {
+        console.error('❌ No se pudo conectar a MySQL después de varios intentos.');
+      }
+    }
+  }
+}
+
+// Crear pool al iniciar
+await createPool();
 
 // 🔹 Ruta de prueba general
 app.get('/', (req, res) => {
@@ -36,7 +60,7 @@ app.get('/api/tablas', async (req, res) => {
     const [tablas] = await pool.query('SHOW TABLES;');
     res.json(tablas);
   } catch (err) {
-    console.error('Error completo en /tablas:', err); // 🔹 muestra todo el objeto error
+    console.error('Error completo en /tablas:', err);
     res.status(500).json({
       error: 'Error interno del servidor',
       detalle: err.message || JSON.stringify(err)
@@ -50,23 +74,13 @@ app.get('/api/tareas', async (req, res) => {
     const [tareas] = await pool.query('SELECT * FROM tareas');
     res.json(tareas);
   } catch (err) {
-    console.error('Error completo en /tareas:', err); // 🔹 muestra todo el objeto error
+    console.error('Error completo en /tareas:', err);
     res.status(500).json({
       error: 'Error interno del servidor',
       detalle: err.message || JSON.stringify(err)
     });
   }
 });
-
-// 🔹 Prueba de conexión a MySQL al iniciar
-pool.getConnection()
-  .then(conn => {
-    console.log('✅ Conexión a MySQL exitosa');
-    conn.release();
-  })
-  .catch(err => {
-    console.error('❌ Error de conexión a MySQL al iniciar:', err); // 🔹 muestra todo el objeto error
-  });
 
 // 🔹 Servidor
 app.listen(PORT, () => {
