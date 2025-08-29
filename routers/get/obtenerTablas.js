@@ -1,5 +1,5 @@
 import express from 'express';
-import { pool } from '../../config/dataBase.js'; // ✅ corregido
+import { pool } from '../../config/dataBase.js';
 const router = express.Router();
 
 router.get('/tablas', async (req, res) => {

@@ -1,39 +1,37 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import { pool } from './config/dataBase.js';
 import getTablas from './routers/get/obtenerTablas.js';
 import getTareas from './routers/get/obtenerTareas.js';
-import { pool } from './config/dataBase.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ CORS
+// ✅ Middleware
 app.use(cors({ origin: '*' }));
-
-// Middleware para parsear JSON
 app.use(express.json());
 
-// Rutas
+// ✅ Rutas
 app.use('/api', getTablas);
 app.use('/api', getTareas);
 
-// Ruta de prueba
 app.get("/", (req, res) => {
   res.json({ message: "Servidor funcionando 🚀" });
 });
 
-// Prueba de conexión a MySQL
-(async () => {
-  try {
-    const [results] = await pool.query("SELECT 1 + 1 AS result");
-    console.log("✅ Conexión a MySQL exitosa:", results[0].result);
-  } catch (err) {
-    console.error("❌ Error de conexión a MySQL:", err.message);
-  }
-})();
+// Conexión segura a MySQL
+pool.getConnection()
+  .then(conn => {
+    console.log('✅ Conexión a MySQL exitosa');
+    conn.release();
+  })
+  .catch(err => {
+    console.error('❌ Error de conexión a MySQL:', err.message);
+    // NOTA: No termina la app, el server seguirá levantándose
+  });
 
 // Servidor
 app.listen(PORT, () => {

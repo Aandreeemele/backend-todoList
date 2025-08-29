@@ -1,8 +1,7 @@
 import express from 'express';
-import { pool } from '../../config/dataBase.js'; // ✅ corregido
+import { pool } from '../../config/dataBase.js';
 const router = express.Router();
 
-// Ruta para obtener todas las tareas
 router.get('/tareas', async (req, res) => {
   try {
     const [tareas] = await pool.query('SELECT * FROM tareas');
