@@ -33,7 +33,7 @@ async function createPool(retries = 5, delay = 3000) {
       const conn = await pool.getConnection();
       console.log('✅ Conexión a MySQL exitosa');
       conn.release();
-      break; // conexión exitosa, salimos del loop
+      break;
     } catch (err) {
       console.error(`❌ Error de conexión a MySQL (intento ${i + 1}):`, err);
       if (i < retries - 1) {
