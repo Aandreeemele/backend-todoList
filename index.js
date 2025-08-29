@@ -36,10 +36,10 @@ app.get('/api/tablas', async (req, res) => {
     const [tablas] = await pool.query('SHOW TABLES;');
     res.json(tablas);
   } catch (err) {
-    console.error('Error en /tablas:', err.message);
+    console.error('Error completo en /tablas:', err); // 🔹 muestra todo el objeto error
     res.status(500).json({
       error: 'Error interno del servidor',
-      detalle: err.message
+      detalle: err.message || JSON.stringify(err)
     });
   }
 });
@@ -50,10 +50,10 @@ app.get('/api/tareas', async (req, res) => {
     const [tareas] = await pool.query('SELECT * FROM tareas');
     res.json(tareas);
   } catch (err) {
-    console.error('Error en /tareas:', err.message);
+    console.error('Error completo en /tareas:', err); // 🔹 muestra todo el objeto error
     res.status(500).json({
       error: 'Error interno del servidor',
-      detalle: err.message
+      detalle: err.message || JSON.stringify(err)
     });
   }
 });
@@ -65,7 +65,7 @@ pool.getConnection()
     conn.release();
   })
   .catch(err => {
-    console.error('❌ Error de conexión a MySQL:', err.message);
+    console.error('❌ Error de conexión a MySQL al iniciar:', err); // 🔹 muestra todo el objeto error
   });
 
 // 🔹 Servidor
